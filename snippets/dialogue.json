@@ -1,0 +1,127 @@
+{
+	"Cue": {
+		"prefix": "~",
+		"body": ["~ ${1:start}", "$0", "=> END"],
+		"description": "A cue (title) that dialogue can start from or jump to"
+	},
+	"Dialogue line": {
+		"prefix": "line",
+		"body": ["${1:Character}: ${0:Dialogue}"],
+		"description": "A line of dialogue spoken by a character"
+	},
+	"Responses": {
+		"prefix": "responses",
+		"body": ["- ${1:First response}", "\t$2", "- ${3:Second response}", "\t$0"],
+		"description": "A set of player responses with nested branches"
+	},
+	"Response with jump": {
+		"prefix": "-=>",
+		"body": ["- ${1:Response} => ${2:cue}"],
+		"description": "A response that jumps to a cue"
+	},
+	"Conditional response": {
+		"prefix": "-if",
+		"body": ["- ${1:Response} [if ${2:condition} /]"],
+		"description": "A response that is only available when the condition is true"
+	},
+	"Jump": {
+		"prefix": "=>",
+		"body": ["=> ${1:cue}"],
+		"description": "Jump to a cue"
+	},
+	"Jump and return": {
+		"prefix": "=><",
+		"body": ["=>< ${1:cue}"],
+		"description": "Jump to a cue, then return here when it ends"
+	},
+	"If": {
+		"prefix": "if",
+		"body": ["if ${1:condition}", "\t$0"],
+		"description": "Conditional block"
+	},
+	"If / else": {
+		"prefix": "ifelse",
+		"body": ["if ${1:condition}", "\t$2", "else", "\t$0"],
+		"description": "Conditional block with an else branch"
+	},
+	"If / elif / else": {
+		"prefix": "ifelif",
+		"body": ["if ${1:condition}", "\t$2", "elif ${3:condition}", "\t$4", "else", "\t$0"],
+		"description": "Conditional block with elif and else branches"
+	},
+	"Match": {
+		"prefix": "match",
+		"body": ["match ${1:value}", "\twhen ${2:1}", "\t\t$3", "\telse", "\t\t$0"],
+		"description": "Match block"
+	},
+	"While": {
+		"prefix": "while",
+		"body": ["while ${1:condition}", "\t$0"],
+		"description": "Loop while the condition is true"
+	},
+	"Mutation": {
+		"prefix": "$>",
+		"body": ["\\$> ${0:expression}"],
+		"description": "Mutate state or call a method"
+	},
+	"Inline mutation": {
+		"prefix": "[$>",
+		"body": ["[\\$> ${0:expression}]"],
+		"description": "Mutation that runs as the text is typed out"
+	},
+	"Inline condition": {
+		"prefix": "[if",
+		"body": ["[if ${1:condition}]${2:text}[/if]"],
+		"description": "Show text only when the condition is true"
+	},
+	"Inline condition with else": {
+		"prefix": "[ifelse",
+		"body": ["[if ${1:condition}]${2:text}[else]${3:other text}[/if]"],
+		"description": "Show one text or the other depending on the condition"
+	},
+	"Interpolation": {
+		"prefix": "{{",
+		"body": ["{{${1:expression}}}"],
+		"description": "Insert the value of an expression"
+	},
+	"Import": {
+		"prefix": "import",
+		"body": ["import \"res://${1:path}.dialogue\" as ${2:name}"],
+		"description": "Import cues from another dialogue file"
+	},
+	"Using": {
+		"prefix": "using",
+		"body": ["using ${1:SomeGlobal}"],
+		"description": "Use an autoload as a state shortcut for this file"
+	},
+	"Random block": {
+		"prefix": "%",
+		"body": ["% ${1:Character}: ${2:Option one}", "% ${3:Character}: ${0:Option two}"],
+		"description": "Pick one line at random"
+	},
+	"Wait": {
+		"prefix": "[wait",
+		"body": ["[wait=${1:1}]"],
+		"description": "Pause typing for N seconds"
+	},
+	"Speed": {
+		"prefix": "[speed",
+		"body": ["[speed=${1:0.5}]"],
+		"description": "Multiply the typing speed"
+	},
+	"Next": {
+		"prefix": "[next",
+		"body": ["[next=${1:auto}]"],
+		"description": "Automatically continue after N seconds (or auto)"
+	},
+	"Tags": {
+		"prefix": "[#",
+		"body": ["[#${1:tag}]"],
+		"description": "Tag a line"
+	},
+	"Line ID": {
+		"prefix": "[ID",
+		"body": ["[ID:${1:LINE_ID}]"],
+		"description": "Static translation key for a line"
+	}
+}

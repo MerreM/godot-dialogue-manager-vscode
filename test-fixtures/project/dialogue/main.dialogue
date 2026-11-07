@@ -1,0 +1,36 @@
+import "res://dialogue/snippets.dialogue" as snippets
+using SomeGlobal
+
+# A comment
+~ start
+Nathan: [#happy, #mood=good] Hello {{player_name}}! [ID:HELLO]
+Nathan: I have [if apples == 1]an apple[else]{{apples}} apples[/if].[wait=0.5] Ok.
+Coco: [[Meow|Mrrp|Purr]] [$> SomeGlobal.purr()][b]bold[/b]
+| Lilly: Me too!
+- Tell me more => more
+- Banter =>< snippets/banter
+- Secret [if SomeGlobal.knows_secret /] => secret
+- Bye
+	Nathan: See ya.
+	=> END
+%2 Nathan: Random one.
+% => start
+
+~ more
+if SomeGlobal.count >= 10 and not SomeGlobal.bored
+	Nathan: That's a lot.
+elif SomeGlobal.count > 0:
+	Nathan: Some.
+else
+	Nathan: None.
+match SomeGlobal.mood
+	when "happy"
+		Nathan: Yay.
+$> SomeGlobal.count += 1
+set SomeGlobal.legacy = true
+=> END!
+
+~ secret
+Nathan: Shh.
+=>< snippets/more_banter
+=> END

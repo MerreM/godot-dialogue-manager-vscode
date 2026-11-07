@@ -1,0 +1,100 @@
+{
+  "name": "godot-dialogue-manager-vscode",
+  "displayName": "Godot Dialogue Manager",
+  "description": "Syntax highlighting, navigation and diagnostics for Godot Dialogue Manager .dialogue files",
+  "version": "0.0.1",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.145.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Linters"
+  ],
+  "keywords": [
+    "godot",
+    "dialogue",
+    "dialogue manager",
+    "gamedev"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.dialogue"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "godot-dialogue",
+        "aliases": [
+          "Godot Dialogue",
+          "dialogue"
+        ],
+        "extensions": [
+          ".dialogue"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "godot-dialogue",
+        "scopeName": "source.godot-dialogue",
+        "path": "./syntaxes/dialogue.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "godot-dialogue",
+        "path": "./snippets/dialogue.json"
+      }
+    ],
+    "configuration": {
+      "title": "Godot Dialogue Manager",
+      "properties": {
+        "godotDialogueManager.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Report problems such as unknown cues, duplicate cues and missing imports in .dialogue files."
+        }
+      }
+    },
+    "configurationDefaults": {
+      "[godot-dialogue]": {
+        "editor.insertSpaces": false,
+        "editor.detectIndentation": false,
+        "editor.wordWrap": "on",
+        "editor.quickSuggestions": {
+          "other": "off",
+          "comments": "off",
+          "strings": "off"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "test:unit": "npm run compile && mocha --ui tdd out/test/unit/**/*.test.js"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.x",
+    "@types/vscode": "^1.145.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0",
+    "eslint": "^10.5.0",
+    "mocha": "^11.8.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
+  },
+  "overrides": {
+    "diff": "^8.0.4",
+    "serialize-javascript": "^7.0.6"
+  }
+}

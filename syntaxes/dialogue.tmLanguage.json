@@ -1,0 +1,480 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Godot Dialogue",
+	"scopeName": "source.godot-dialogue",
+	"fileTypes": ["dialogue"],
+	"patterns": [
+		{ "include": "#line" }
+	],
+	"repository": {
+		"line": {
+			"patterns": [
+				{ "include": "#comment" },
+				{ "include": "#import" },
+				{ "include": "#using" },
+				{ "include": "#cue" },
+				{ "include": "#goto-line" },
+				{ "include": "#mutation-line" },
+				{ "include": "#else-line" },
+				{ "include": "#condition-line" },
+				{ "include": "#random-line" },
+				{ "include": "#concurrent-line" },
+				{ "include": "#response-line" },
+				{ "include": "#dialogue-line" }
+			]
+		},
+
+		"comment": {
+			"patterns": [
+				{
+					"name": "comment.line.double-number-sign.translator.godot-dialogue",
+					"match": "^\\s*(##).*$",
+					"captures": { "1": { "name": "punctuation.definition.comment.godot-dialogue" } }
+				},
+				{
+					"name": "comment.line.number-sign.godot-dialogue",
+					"match": "^\\s*(#).*$",
+					"captures": { "1": { "name": "punctuation.definition.comment.godot-dialogue" } }
+				}
+			]
+		},
+		"trailing-comment": {
+			"name": "comment.line.number-sign.godot-dialogue",
+			"match": "(?<=\\s)(#)(?!\\w*=).*$",
+			"captures": { "1": { "name": "punctuation.definition.comment.godot-dialogue" } }
+		},
+
+		"import": {
+			"name": "meta.import.godot-dialogue",
+			"match": "^\\s*(import)\\s+(\"[^\"]*\")\\s+(as)\\s+([^\\s#]+)",
+			"captures": {
+				"1": { "name": "keyword.control.import.godot-dialogue" },
+				"2": { "name": "string.quoted.double.godot-dialogue" },
+				"3": { "name": "keyword.control.as.godot-dialogue" },
+				"4": { "name": "entity.name.namespace.godot-dialogue" }
+			}
+		},
+
+		"using": {
+			"name": "meta.using.godot-dialogue",
+			"match": "^\\s*(using)\\s+(.*)$",
+			"captures": {
+				"1": { "name": "keyword.control.using.godot-dialogue" },
+				"2": { "name": "entity.name.type.godot-dialogue" }
+			}
+		},
+
+		"cue": {
+			"name": "meta.cue.godot-dialogue",
+			"match": "^\\s*(~)\\s+(\\S+)(.*)$",
+			"captures": {
+				"1": { "name": "keyword.operator.cue.godot-dialogue" },
+				"2": { "name": "entity.name.function.cue.godot-dialogue" },
+				"3": { "patterns": [{ "include": "#trailing-comment" }] }
+			}
+		},
+
+		"goto-line": {
+			"name": "meta.goto.godot-dialogue",
+			"begin": "^\\s*(?==><?\\s)",
+			"end": "$",
+			"patterns": [{ "include": "#goto" }]
+		},
+		"goto": {
+			"patterns": [
+				{
+					"match": "(=><?)\\s+(\\{\\{.*?\\}\\})",
+					"captures": {
+						"1": { "name": "keyword.control.goto.godot-dialogue" },
+						"2": { "patterns": [{ "include": "#interpolation" }] }
+					}
+				},
+				{
+					"match": "(=><?)\\s+(END!?)(?=\\s|$)",
+					"captures": {
+						"1": { "name": "keyword.control.goto.godot-dialogue" },
+						"2": { "name": "constant.language.end.godot-dialogue" }
+					}
+				},
+				{
+					"match": "(=><?)\\s+(?:([^\\s/#\\[\\]]+)(/))?([^\\s#\\[\\]]+)",
+					"captures": {
+						"1": { "name": "keyword.control.goto.godot-dialogue" },
+						"2": { "name": "entity.name.namespace.godot-dialogue" },
+						"3": { "name": "punctuation.separator.namespace.godot-dialogue" },
+						"4": { "name": "entity.name.function.cue.godot-dialogue" }
+					}
+				},
+				{ "include": "#trailing-comment" }
+			]
+		},
+
+		"mutation-line": {
+			"name": "meta.mutation.godot-dialogue",
+			"begin": "^\\s*(\\$>>?|do!?|set)(?=\\s)",
+			"beginCaptures": { "1": { "name": "keyword.control.mutation.godot-dialogue" } },
+			"end": "$",
+			"patterns": [{ "include": "#expression" }]
+		},
+
+		"else-line": {
+			"name": "meta.condition.godot-dialogue",
+			"match": "^\\s*(else)\\s*(:)?\\s*(#.*)?$",
+			"captures": {
+				"1": { "name": "keyword.control.conditional.godot-dialogue" },
+				"2": { "name": "punctuation.separator.colon.godot-dialogue" },
+				"3": { "name": "comment.line.number-sign.godot-dialogue" }
+			}
+		},
+		"condition-line": {
+			"name": "meta.condition.godot-dialogue",
+			"begin": "^\\s*(if|elif|else\\s+if|while|match|when)(?=\\s)",
+			"beginCaptures": { "1": { "name": "keyword.control.conditional.godot-dialogue" } },
+			"end": "(:)?\\s*$",
+			"endCaptures": { "1": { "name": "punctuation.separator.colon.godot-dialogue" } },
+			"patterns": [{ "include": "#expression" }]
+		},
+
+		"random-line": {
+			"name": "meta.random.godot-dialogue",
+			"begin": "^\\s*(%)([\\d.]+)?",
+			"beginCaptures": {
+				"1": { "name": "keyword.operator.random.godot-dialogue" },
+				"2": { "name": "constant.numeric.weight.godot-dialogue" }
+			},
+			"end": "$",
+			"patterns": [
+				{ "include": "#wrapped-condition" },
+				{ "include": "#goto" },
+				{ "include": "#speaker" },
+				{ "include": "#dialogue-inline" }
+			]
+		},
+
+		"concurrent-line": {
+			"name": "meta.concurrent.godot-dialogue",
+			"begin": "^\\s*(\\|)(?=\\s)",
+			"beginCaptures": { "1": { "name": "keyword.operator.concurrent.godot-dialogue" } },
+			"end": "$",
+			"patterns": [
+				{ "include": "#speaker" },
+				{ "include": "#dialogue-inline" }
+			]
+		},
+
+		"response-line": {
+			"name": "meta.response.godot-dialogue",
+			"begin": "^\\s*(-)(?=\\s)",
+			"beginCaptures": { "1": { "name": "keyword.operator.response.godot-dialogue" } },
+			"end": "$",
+			"patterns": [
+				{ "include": "#speaker" },
+				{ "include": "#goto" },
+				{ "include": "#dialogue-inline" }
+			]
+		},
+
+		"dialogue-line": {
+			"name": "meta.dialogue.godot-dialogue",
+			"begin": "^\\s*(?=\\S)",
+			"end": "$",
+			"patterns": [
+				{ "include": "#speaker" },
+				{ "include": "#goto" },
+				{ "include": "#dialogue-inline" }
+			]
+		},
+
+		"speaker": {
+			"comment": "Character name: anything up to the first unescaped colon followed by whitespace, starting right after the line prefix.",
+			"match": "\\G\\s*((?:\\{\\{.*?\\}\\}|\\\\.|[^:\\[\\]{}\\\\\\s]|\\s(?=[^:\\s]))+)(:)(?=\\s|$)",
+			"captures": {
+				"1": {
+					"name": "entity.name.type.character.godot-dialogue",
+					"patterns": [{ "include": "#interpolation" }, { "include": "#escape" }]
+				},
+				"2": { "name": "punctuation.separator.speaker.godot-dialogue" }
+			}
+		},
+
+		"dialogue-inline": {
+			"patterns": [
+				{ "include": "#escape" },
+				{ "include": "#interpolation" },
+				{ "include": "#inline-random" },
+				{ "include": "#line-id" },
+				{ "include": "#tags" },
+				{ "include": "#wrapped-condition" },
+				{ "include": "#inline-condition" },
+				{ "include": "#inline-mutation" },
+				{ "include": "#runtime-tag" },
+				{ "include": "#bbcode" }
+			]
+		},
+
+		"escape": {
+			"name": "constant.character.escape.godot-dialogue",
+			"match": "\\\\."
+		},
+
+		"interpolation": {
+			"name": "meta.interpolation.godot-dialogue",
+			"begin": "\\{\\{",
+			"beginCaptures": { "0": { "name": "punctuation.section.interpolation.begin.godot-dialogue" } },
+			"end": "\\}\\}",
+			"endCaptures": { "0": { "name": "punctuation.section.interpolation.end.godot-dialogue" } },
+			"contentName": "meta.embedded.expression.godot-dialogue",
+			"patterns": [{ "include": "#expression" }]
+		},
+
+		"inline-random": {
+			"name": "meta.random.inline.godot-dialogue",
+			"begin": "\\[\\[",
+			"beginCaptures": { "0": { "name": "punctuation.section.random.begin.godot-dialogue" } },
+			"end": "\\]\\]",
+			"endCaptures": { "0": { "name": "punctuation.section.random.end.godot-dialogue" } },
+			"patterns": [
+				{ "match": "\\|", "name": "punctuation.separator.random.godot-dialogue" },
+				{ "include": "#interpolation" }
+			]
+		},
+
+		"line-id": {
+			"name": "meta.line-id.godot-dialogue",
+			"match": "(\\[)(ID)(:)([^\\]]*)(\\])",
+			"captures": {
+				"1": { "name": "punctuation.definition.tag.begin.godot-dialogue" },
+				"2": { "name": "keyword.other.id.godot-dialogue" },
+				"3": { "name": "punctuation.separator.godot-dialogue" },
+				"4": { "name": "constant.other.line-id.godot-dialogue" },
+				"5": { "name": "punctuation.definition.tag.end.godot-dialogue" }
+			}
+		},
+
+		"tags": {
+			"name": "meta.tags.godot-dialogue",
+			"begin": "\\[(?=#)",
+			"beginCaptures": { "0": { "name": "punctuation.definition.tag.begin.godot-dialogue" } },
+			"end": "\\]",
+			"endCaptures": { "0": { "name": "punctuation.definition.tag.end.godot-dialogue" } },
+			"patterns": [
+				{
+					"match": "(#)([^\\s,=\\]]+)(?:(=)([^,\\]]*))?",
+					"captures": {
+						"1": { "name": "punctuation.definition.tag.godot-dialogue" },
+						"2": { "name": "entity.other.attribute-name.tag.godot-dialogue" },
+						"3": { "name": "keyword.operator.assignment.godot-dialogue" },
+						"4": { "name": "string.unquoted.tag-value.godot-dialogue" }
+					}
+				},
+				{ "match": ",", "name": "punctuation.separator.comma.godot-dialogue" }
+			]
+		},
+
+		"wrapped-condition": {
+			"comment": "[if expression /] on responses and random lines",
+			"name": "meta.condition.wrapped.godot-dialogue",
+			"begin": "(\\[)(if)(?=\\s)(?=[^\\]]*/\\])",
+			"beginCaptures": {
+				"1": { "name": "punctuation.definition.tag.begin.godot-dialogue" },
+				"2": { "name": "keyword.control.conditional.godot-dialogue" }
+			},
+			"end": "(/)(\\])",
+			"endCaptures": {
+				"1": { "name": "punctuation.definition.tag.godot-dialogue" },
+				"2": { "name": "punctuation.definition.tag.end.godot-dialogue" }
+			},
+			"patterns": [{ "include": "#expression" }]
+		},
+
+		"inline-condition": {
+			"patterns": [
+				{
+					"name": "meta.condition.inline.godot-dialogue",
+					"begin": "(\\[)(if)(?=\\s)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.tag.begin.godot-dialogue" },
+						"2": { "name": "keyword.control.conditional.godot-dialogue" }
+					},
+					"end": "\\]",
+					"endCaptures": { "0": { "name": "punctuation.definition.tag.end.godot-dialogue" } },
+					"patterns": [{ "include": "#expression" }]
+				},
+				{
+					"match": "(\\[)(else|/if)(\\])",
+					"captures": {
+						"1": { "name": "punctuation.definition.tag.begin.godot-dialogue" },
+						"2": { "name": "keyword.control.conditional.godot-dialogue" },
+						"3": { "name": "punctuation.definition.tag.end.godot-dialogue" }
+					}
+				}
+			]
+		},
+
+		"inline-mutation": {
+			"name": "meta.mutation.inline.godot-dialogue",
+			"begin": "(\\[)(\\$>>?|do!?|set)(?=\\s)",
+			"beginCaptures": {
+				"1": { "name": "punctuation.definition.tag.begin.godot-dialogue" },
+				"2": { "name": "keyword.control.mutation.godot-dialogue" }
+			},
+			"end": "\\]",
+			"endCaptures": { "0": { "name": "punctuation.definition.tag.end.godot-dialogue" } },
+			"patterns": [{ "include": "#expression" }]
+		},
+
+		"runtime-tag": {
+			"comment": "Dialogue Manager specific tags: [wait], [wait=N], [speed=N], [next=N]",
+			"name": "meta.tag.runtime.godot-dialogue",
+			"begin": "(\\[)(wait|speed|next)(?=[=\\]])",
+			"beginCaptures": {
+				"1": { "name": "punctuation.definition.tag.begin.godot-dialogue" },
+				"2": { "name": "support.function.runtime-tag.godot-dialogue" }
+			},
+			"end": "\\]",
+			"endCaptures": { "0": { "name": "punctuation.definition.tag.end.godot-dialogue" } },
+			"patterns": [
+				{ "match": "=", "name": "keyword.operator.assignment.godot-dialogue" },
+				{ "match": "\\bauto\\b", "name": "constant.language.auto.godot-dialogue" },
+				{
+					"begin": "\\[",
+					"end": "\\]",
+					"patterns": [{ "include": "#expression" }]
+				},
+				{ "include": "#expression" }
+			]
+		},
+
+		"bbcode": {
+			"name": "meta.tag.bbcode.godot-dialogue",
+			"match": "(\\[)(/?)([a-zA-Z_][\\w]*)((?:[= ][^\\]]*)?)(\\])",
+			"captures": {
+				"1": { "name": "punctuation.definition.tag.begin.godot-dialogue" },
+				"2": { "name": "punctuation.definition.tag.godot-dialogue" },
+				"3": { "name": "entity.name.tag.bbcode.godot-dialogue" },
+				"4": {
+					"patterns": [
+						{
+							"match": "([\\w-]*)(=)(\"[^\"]*\"|[^\\s\\]]*)",
+							"captures": {
+								"1": { "name": "entity.other.attribute-name.godot-dialogue" },
+								"2": { "name": "keyword.operator.assignment.godot-dialogue" },
+								"3": { "name": "string.unquoted.godot-dialogue" }
+							}
+						}
+					]
+				},
+				"5": { "name": "punctuation.definition.tag.end.godot-dialogue" }
+			}
+		},
+
+		"expression": {
+			"patterns": [
+				{ "include": "#string" },
+				{ "include": "#number" },
+				{
+					"name": "constant.language.godot-dialogue",
+					"match": "\\b(true|false|null)\\b"
+				},
+				{
+					"name": "keyword.operator.logical.godot-dialogue",
+					"match": "\\b(and|or|not|in)\\b|&&|\\|\\||!(?!=)"
+				},
+				{
+					"name": "keyword.control.await.godot-dialogue",
+					"match": "\\bawait\\b"
+				},
+				{
+					"name": "variable.language.self.godot-dialogue",
+					"match": "\\bself\\b"
+				},
+				{
+					"name": "keyword.operator.comparison.godot-dialogue",
+					"match": "==|!=|<=|>=|<|>"
+				},
+				{
+					"name": "keyword.operator.assignment.godot-dialogue",
+					"match": "\\+=|-=|\\*=|/=|="
+				},
+				{
+					"name": "keyword.operator.arithmetic.godot-dialogue",
+					"match": "\\+|-|\\*|/|%"
+				},
+				{
+					"name": "punctuation.accessor.optional.godot-dialogue",
+					"match": "\\?\\."
+				},
+				{
+					"name": "punctuation.accessor.godot-dialogue",
+					"match": "\\."
+				},
+				{
+					"name": "punctuation.separator.comma.godot-dialogue",
+					"match": ","
+				},
+				{
+					"match": "([\\p{L}_][\\p{L}\\p{N}_]*)\\s*(?=\\()",
+					"captures": { "1": { "name": "entity.name.function.godot-dialogue" } }
+				},
+				{
+					"match": "(?<=\\.)([\\p{L}_][\\p{L}\\p{N}_]*)",
+					"captures": { "1": { "name": "variable.other.property.godot-dialogue" } }
+				},
+				{
+					"match": "\\b([A-Z][\\p{L}\\p{N}_]*)\\b",
+					"captures": { "1": { "name": "entity.name.type.class.godot-dialogue" } }
+				},
+				{
+					"name": "variable.other.godot-dialogue",
+					"match": "[\\p{L}_][\\p{L}\\p{N}_]*"
+				},
+				{
+					"begin": "\\(",
+					"beginCaptures": { "0": { "name": "punctuation.section.parens.begin.godot-dialogue" } },
+					"end": "\\)",
+					"endCaptures": { "0": { "name": "punctuation.section.parens.end.godot-dialogue" } },
+					"patterns": [{ "include": "#expression" }]
+				},
+				{
+					"begin": "\\[",
+					"beginCaptures": { "0": { "name": "punctuation.section.brackets.begin.godot-dialogue" } },
+					"end": "\\]",
+					"endCaptures": { "0": { "name": "punctuation.section.brackets.end.godot-dialogue" } },
+					"patterns": [{ "include": "#expression" }]
+				},
+				{
+					"begin": "\\{(?!\\{)",
+					"beginCaptures": { "0": { "name": "punctuation.section.braces.begin.godot-dialogue" } },
+					"end": "\\}",
+					"endCaptures": { "0": { "name": "punctuation.section.braces.end.godot-dialogue" } },
+					"patterns": [
+						{ "match": ":", "name": "punctuation.separator.key-value.godot-dialogue" },
+						{ "include": "#expression" }
+					]
+				}
+			]
+		},
+
+		"string": {
+			"patterns": [
+				{
+					"name": "string.quoted.double.godot-dialogue",
+					"begin": "&?\"",
+					"end": "\"",
+					"patterns": [{ "name": "constant.character.escape.godot-dialogue", "match": "\\\\." }]
+				},
+				{
+					"name": "string.quoted.single.godot-dialogue",
+					"begin": "&?'",
+					"end": "'",
+					"patterns": [{ "name": "constant.character.escape.godot-dialogue", "match": "\\\\." }]
+				}
+			]
+		},
+
+		"number": {
+			"name": "constant.numeric.godot-dialogue",
+			"match": "\\b\\d+(\\.\\d+)?\\b"
+		}
+	}
+}

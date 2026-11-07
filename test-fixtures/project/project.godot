@@ -1,0 +1,5 @@
+; Minimal Godot project file used by the extension tests.
+config_version=5
+
+[application]
+config/name="Dialogue Fixtures"
