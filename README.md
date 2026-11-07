@@ -41,4 +41,4 @@ npm run test:unit    # parser tests in plain Node
 npm test             # full extension tests inside VS Code
 ```
 
-Press `F5` to launch an Extension Development Host. [test-fixtures/project](test-fixtures/project) is a small Godot project you can open there to try things out.
+Press `F5` to launch an Extension Development Host. `test-fixtures/project` is a small Godot project you can open there to try things out.
